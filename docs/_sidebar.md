@@ -20,6 +20,7 @@
     - [3.5. Iniciativas Extras - Padrões de Projeto](/PadroesDeProjeto/3.5.IniciativasExtras.md)
 
 - **Atas de Reunião**
-  - [Ata 1](/AtasDeReunião/reuniao1905.md)
+  - [Ata 19/05](/AtasDeReunião/reuniao1905.md)
+  - [Ata 22/05](/AtasDeReunião/reuniao2205.md)
   
       
