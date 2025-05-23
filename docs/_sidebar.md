@@ -10,7 +10,7 @@
       - [3.1.3 Equipe 3 <- EXEMPLO](/PadroesDeProjeto/3.1.3GoFsCriacional3.md)
     - [3.2. Padrões de Projeto GoFs Estruturais](/PadroesDeProjeto/3.2.GoFsEstruturais.md)
       - [3.2.1 Equipe 1](/)
-      - [3.2.2 Equipe 2](PadroesDeProjeto/3.2.2.GoFsCriacional2.md)
+      - [3.2.2 Equipe 2](PadroesDeProjeto/3.2.2.GoFsCriacional.md)
       - [3.2.3 Equipe 3](/)
     - [3.3. Padrões de Projeto GoFs Comportamentais](/PadroesDeProjeto/3.3.GoFsComportamentais.md)
       - [3.3.1 Equipe 1](/)
