@@ -18,8 +18,9 @@
       - [3.3.3 Equipe 3](/PadroesDeProjeto/3.3.3.GofsComportamentais.md)
     - [3.4. Participações - Padrões de Projeto](/PadroesDeProjeto/3.4.ParticipacoesPadroes.md)
     - [3.5. Iniciativas Extras - Padrões de Projeto](/PadroesDeProjeto/3.5.IniciativasExtras.md)
+      - [3.5.1 Novo Diagrama de Classes](/PadroesDeProjeto/3.5.1.AtualizaçãoDiagramaClasses.md)
 
-- **Atas de Reunião**
+- **Atas de Reunião** 
   - [Ata 19/05](/AtasDeReunião/reuniao1905.md)
   - [Ata 22/05](/AtasDeReunião/reuniao2205.md)
   - [Ata 23/05](/AtasDeReunião/reuniao2305.md)
