@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 # Produto
 class MidiaDigital(ABC):
-    def __init__(self, url: str, formato: str, legenda: Optional[str] = None):
+    def __init__(self, id: int, url: str, formato: str, legenda: Optional[str] = None):
+        self.id = id # Added ID attribute
         self.url = url
         self.formato = formato
         self.legenda = legenda if legenda else "Mídia sem legenda"
@@ -16,8 +17,8 @@ class Video(MidiaDigital):
     """
     Representa um arquivo de vídeo, um tipo de MidiaDigital.
     """
-    def __init__(self, url: str, formato: str, legenda: Optional[str] = None, duracao: str = "00:00"):
-        super().__init__(url, formato, legenda)
+    def __init__(self, id: int, url: str, formato: str, legenda: Optional[str] = None, duracao: str = "00:00"):
+        super().__init__(id, url, formato, legenda)
         self.duracao = duracao # Atributo específico do vídeo
 
 # Produto Concreto 2
@@ -25,35 +26,48 @@ class Imagem(MidiaDigital):
     """
     Representa um arquivo de imagem, um tipo de MidiaDigital.
     """
-    def __init__(self, url: str, formato: str, legenda: Optional[str] = None, resolucao: str = "N/A"):
-        super().__init__(url, formato, legenda)
+    def __init__(self, id: int, url: str, formato: str, legenda: Optional[str] = None, resolucao: str = "N/A"):
+        super().__init__(id, url, formato, legenda)
         self.resolucao = resolucao # Atributo específico da imagem
 
 # Creator (fábrica abstrata)
 class CreateMidiaDigital(ABC):
     def __init__(self):
-        self.midia = None
+        self.midia: Optional[MidiaDigital] = None # Type hint for self.midia
 
     @abstractmethod
-    def criarMidia(self, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
+    def criarMidia(self, id: int, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
         pass
 
-    def enviar(self):
-        print(f"Enviando mídia com ID {self.midia.id} e legenda: {self.midia.legenda}")
+    def enviar(self) -> str:
+        if self.midia and hasattr(self.midia, 'id'):
+            msg = f"Enviando mídia com ID {self.midia.id}, formato {self.midia.formato}, legenda: {self.midia.legenda}."
+            # Adicionando detalhes específicos do tipo de mídia
+            if isinstance(self.midia, Video):
+                msg += f" Duração: {self.midia.duracao}."
+            elif isinstance(self.midia, Imagem):
+                msg += f" Resolução: {self.midia.resolucao}."
+            print(msg) # Server log
+            return msg
+        else:
+            err_msg = "Erro: Mídia não criada ou sem ID para enviar."
+            print(err_msg)
+            return err_msg
 
 # Fábrica concreta para vídeo
 class CreateVideo(CreateMidiaDigital):
-
-    def criarMidia(self, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
+    def criarMidia(self, id: int, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
         duracao = kwargs.get("duracao", "00:00")
-        return Video(url, formato, legenda, duracao=duracao)
+        self.midia = Video(id, url, formato, legenda, duracao=duracao)
+        return self.midia
 
 # Fábrica concreta para imagem
 class CreateImagem(CreateMidiaDigital):
-
-    def criar_midia(self, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
+    # Corrected method name to match abstract and other concrete factory
+    def criarMidia(self, id: int, url: str, formato: str, legenda: Optional[str] = None, **kwargs: Any) -> MidiaDigital:
         resolucao = kwargs.get("resolucao", "N/A")
-        return Imagem(url, formato, legenda, resolucao=resolucao)
+        self.midia = Imagem(id, url, formato, legenda, resolucao=resolucao)
+        return self.midia
     
 
 # Frontend HTML com CSS e JS integrados (inline no render_template_string)
@@ -122,7 +136,7 @@ frontend_html = """
     #resultado {
         margin-top: 30px;
         font-weight: bold;
-        font-size: 18px;
+        font-size: 16px; /* Adjusted font size for potentially longer messages */
         color: #222;
         padding: 15px;
         background-color: #e8f5e9;
@@ -146,14 +160,18 @@ frontend_html = """
         <label for="id">ID:</label>
         <input type="number" id="id" name="id" required min="1" />
 
-        <label for="legenda">Legenda:</label>
-        <input type="text" id="legenda" name="legenda" required />
-
         <label for="url_arquivo">URL do Arquivo:</label>
-        <input type="text" id="url_arquivo" name="url_arquivo" required />
+        <input type="text" id="url_arquivo" name="url_arquivo" placeholder="https://exemplo.com/midia" required />
+        
+        <label for="formato">Formato:</label>
+        <input type="text" id="formato" name="formato" placeholder="Ex: mp4, jpg, png" required />
 
-        <div id="resolucaoContainer" style="display:none;">
-            <label for="resolucao">Resolução:</label>
+        <label for="legenda">Legenda:</label>
+        <input type="text" id="legenda" name="legenda" placeholder="Digite a legenda da mídia" /> <div id="duracaoContainer" style="display:block;"> <label for="duracao">Duração:</label>
+            <input type="text" id="duracao" name="duracao" placeholder="Ex: 00:03:45" required />
+        </div>
+
+        <div id="resolucaoContainer" style="display:none;"> <label for="resolucao">Resolução:</label>
             <input type="text" id="resolucao" name="resolucao" placeholder="Ex: 1920x1080" />
         </div>
 
@@ -164,23 +182,43 @@ frontend_html = """
 
 <script>
     const tipoSelect = document.getElementById('tipo');
+    const duracaoContainer = document.getElementById('duracaoContainer');
+    const duracaoInput = document.getElementById('duracao');
     const resolucaoContainer = document.getElementById('resolucaoContainer');
+    const resolucaoInput = document.getElementById('resolucao');
 
-    tipoSelect.addEventListener('change', function() {
-        if (this.value === 'imagem') {
+    // Function to update form based on media type
+    function atualizarCamposMidia() {
+        if (tipoSelect.value === 'imagem') {
             resolucaoContainer.style.display = 'block';
-            document.getElementById('resolucao').required = true;
-        } else {
+            resolucaoInput.required = true;
+            
+            duracaoContainer.style.display = 'none';
+            duracaoInput.required = false;
+            duracaoInput.value = ''; // Clear value when hidden
+        } else { // 'video' or any other default
+            duracaoContainer.style.display = 'block';
+            duracaoInput.required = true;
+
             resolucaoContainer.style.display = 'none';
-            document.getElementById('resolucao').required = false;
-            document.getElementById('resolucao').value = '';
+            resolucaoInput.required = false;
+            resolucaoInput.value = ''; // Clear value when hidden
         }
-    });
+    }
+
+    // Event listener for type change
+    tipoSelect.addEventListener('change', atualizarCamposMidia);
+
+    // Initial call to set correct fields based on default selection
+    document.addEventListener('DOMContentLoaded', atualizarCamposMidia);
 
     document.getElementById('midiaForm').addEventListener('submit', async function(event) {
         event.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
+
+        // Legenda é opcional, se estiver vazia, não enviar ou enviar como null/string vazia
+        // O backend já lida com legenda opcional, então está OK.
 
         try {
             const response = await fetch('/midia', {
@@ -191,12 +229,23 @@ frontend_html = """
                 body: JSON.stringify(data)
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Erro no envio");
+            const resultText = await response.text(); // Get text first for debugging
+            let result;
+            try {
+                result = JSON.parse(resultText);
+            } catch (e) {
+                // If parsing fails, means it's probably not a JSON error from server
+                // or server returned non-JSON for an error.
+                document.getElementById('resultado').textContent = "Erro: Resposta inesperada do servidor. " + resultText;
+                console.error("Server response (not JSON):", resultText);
+                return;
             }
+            
 
-            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || "Erro no envio. Código: " + response.status);
+            }
+            
             document.getElementById('resultado').textContent = result.message;
         } catch (error) {
             document.getElementById('resultado').textContent = "Erro: " + error.message;
@@ -214,37 +263,55 @@ def index():
     return render_template_string(frontend_html)
 
 @app.route('/midia', methods=['POST'])
-def criar_midia():
+def criar_midia_endpoint(): # Renamed to avoid conflict with class method names
     data = request.get_json()
 
     tipo = data.get('tipo')
     try:
-        id = int(data.get('id'))
+        # Use a different variable name to avoid conflict with built-in id
+        id_val = int(data.get('id'))
     except (ValueError, TypeError):
-        return jsonify({'message': 'ID inválido'}), 400
+        return jsonify({'message': 'ID inválido. Deve ser um número.'}), 400
 
-    legenda = data.get('legenda')
+    legenda = data.get('legenda', '') # Default to empty string if not provided
     url_arquivo = data.get('url_arquivo')
-    resolucao = data.get('resolucao')  # Pode ser None se não for imagem
+    formato = data.get('formato') # New field from frontend
+    
+    # Specific fields
+    resolucao = data.get('resolucao')
+    duracao = data.get('duracao')
 
-    if not all([tipo, id, legenda, url_arquivo]):
-        return jsonify({'message': 'Dados incompletos'}), 400
+    if not all([tipo, id_val is not None, url_arquivo, formato]): # Check for essential fields
+        return jsonify({'message': 'Dados incompletos. Tipo, ID, URL do Arquivo e Formato são obrigatórios.'}), 400
+    
+    if id_val <= 0:
+        return jsonify({'message': 'ID deve ser um número positivo.'}), 400
+
+    criador: Optional[CreateMidiaDigital] = None
+    midia_criada: Optional[MidiaDigital] = None
 
     if tipo == 'video':
+        if not duracao: # Duração é obrigatória para vídeo
+            return jsonify({'message': 'Duração é obrigatória para vídeos.'}), 400
         criador = CreateVideo()
-        midia = criador.factory_method(id=id, legenda=legenda, url_arquivo=url_arquivo)
+        midia_criada = criador.criarMidia(id=id_val, url=url_arquivo, formato=formato, legenda=legenda, duracao=duracao)
     elif tipo == 'imagem':
-        if not resolucao:
-            return jsonify({'message': 'Resolução obrigatória para imagens'}), 400
+        if not resolucao: # Resolução é obrigatória para imagem
+            return jsonify({'message': 'Resolução é obrigatória para imagens.'}), 400
         criador = CreateImagem()
-        midia = criador.factory_method(id=id, legenda=legenda, url_arquivo=url_arquivo, resolucao=resolucao)
+        # Ensure the correct method name is called for CreateImagem
+        midia_criada = criador.criarMidia(id=id_val, url=url_arquivo, formato=formato, legenda=legenda, resolucao=resolucao)
     else:
-        return jsonify({'message': 'Tipo de mídia inválido'}), 400
+        return jsonify({'message': 'Tipo de mídia inválido.'}), 400
 
-    msg = criador.enviar()
+    if midia_criada and criador:
+        # The criador.midia is set within its criarMidia method.
+        msg = criador.enviar()
+        return jsonify({'message': msg, 'status': 'success'})
+    else:
+        # This case should ideally not be reached if tipo is valid
+        return jsonify({'message': 'Erro ao processar a mídia.'}), 500
 
-    return jsonify({'message': msg})
 
 if __name__ == '__main__':
     app.run(debug=True)
-
