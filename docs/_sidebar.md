@@ -26,5 +26,6 @@
   - [Ata 23/05](/AtasDeReunião/reuniao2305.md)
   - [Ata 26/05](/AtasDeReunião/reuniao2605.md)
   - [Ata 28/05](/AtasDeReunião/reuniao2805.md)
+  - [Ata 30/05](/AtasDeReunião/reuniao3005.md)
   
       
