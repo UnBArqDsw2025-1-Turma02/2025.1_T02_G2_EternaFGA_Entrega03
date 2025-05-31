@@ -14,7 +14,7 @@
       - [3.2.3 Equipe 3](/PadroesDeProjeto/3.2.3.GoFsEstruturais.md)
     - [3.3. Padrões de Projeto GoFs Comportamentais](/PadroesDeProjeto/3.3.GoFsComportamentais.md)
       - [3.3.1 Strategy](/PadroesDeProjeto/GOFsComportamentais/3.3.1.Strategy.md)
-      - [3.3.2 Equipe 2](/)
+      - [3.3.2 State](/PadroesDeProjeto/GOFsComportamentais/3.3.2.State.md)
       - [3.3.3 Equipe 3](/PadroesDeProjeto/3.3.3.GofsComportamentais.md)
     - [3.4. Participações - Padrões de Projeto](/PadroesDeProjeto/3.4.ParticipacoesPadroes.md)
     - [3.5. Iniciativas Extras - Padrões de Projeto](/PadroesDeProjeto/3.5.IniciativasExtras.md)
