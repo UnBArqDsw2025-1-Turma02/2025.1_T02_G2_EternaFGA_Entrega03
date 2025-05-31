@@ -10,7 +10,7 @@
       - [3.1.3 Builder "Enviar Memórias"](/PadroesDeProjeto/3.1.3.GoFsCriacional.md)
     - [3.2. Padrões de Projeto GoFs Estruturais](/PadroesDeProjeto/3.2.GoFsEstruturais.md)
       - [3.2.1 Composite](/PadroesDeProjeto/GOFsEstruturais/3.2.1.Composite.md)
-      - [3.2.2 Equipe 2](/)
+      - [3.2.2 Decorator](/PadroesDeProjeto/GOFsEstruturais/3.2.2.Decorator.md)
       - [3.2.3 Equipe 3](/PadroesDeProjeto/3.2.3.GoFsEstruturais.md)
     - [3.3. Padrões de Projeto GoFs Comportamentais](/PadroesDeProjeto/3.3.GoFsComportamentais.md)
       - [3.3.1 Strategy](/PadroesDeProjeto/GOFsComportamentais/3.3.1.Strategy.md)
