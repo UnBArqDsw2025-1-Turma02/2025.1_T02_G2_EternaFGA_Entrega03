@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Strategy Pattern Demo - Mídias (Simples)</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; background-color: #f9f9f9; color: #333; }
+        .container { max-width: 900px; margin: auto; background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #444; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .media-list, .forms-section, .logs-section { margin-bottom: 30px; }
+        .media-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 5px; background-color: #fdfdfd; }
+        .media-item h3 { margin-top: 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="number"], select {
+            width: calc(100% - 22px); padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px;
+        }
+        button, input[type="submit"] {
+            background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;
+        }
+        button:hover, input[type="submit"]:hover { background-color: #0056b3; }
+        .process-form select { width: auto; margin-right: 10px; }
+        .logs { font-size: 0.9em; background-color: #e9ecef; padding: 10px; border-radius: 4px; max-height: 150px; overflow-y: auto; }
+        .logs p { margin: 5px 0; white-space: pre-wrap; }
+        .flash-messages { list-style-type: none; padding: 0; margin-bottom: 15px; }
+        .flash-messages li { padding: 10px; border-radius: 4px; margin-bottom: 5px; }
+        .flash-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .flash-error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .flash-info { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .flash-warning { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+        .action-buttons form { display: inline-block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Demonstração do Padrão Strategy</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="flash-messages">
+            {% for category, message in messages %}
+              <li class="flash-{{ category }}">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <div class="forms-section">
+            <h2>Adicionar Mídia</h2>
+            <form action="{{ url_for('add_media_route') }}" method="POST">
+                <label for="tipo_midia">Tipo:</label>
+                <select name="tipo_midia" id="tipo_midia">
+                    <option value="video">Vídeo</option>
+                    <option value="imagem">Imagem</option>
+                </select>
+                <label for="legenda">Legenda:</label>
+                <input type="text" name="legenda" id="legenda" value="Nova Mídia">
+                <label for="formato_original">Formato Original:</label>
+                <input type="text" name="formato_original" id="formato_original" value="RAW">
+                <button type="submit">Adicionar</button>
+            </form>
+            <hr style="margin: 20px 0;">
+             <form action="{{ url_for('reset_demo_route') }}" method="POST" style="margin-top:10px;">
+                <button type="submit" style="background-color: #dc3545;">Reiniciar Demonstração</button>
+            </form>
+        </div>
+
+        <div class="media-list">
+            <h2>Mídias Cadastradas</h2>
+            {% if midias %}
+                {% for midia in midias %}
+                <div class="media-item">
+                    <h3>{{ midia.tipo() }}: {{ midia.legenda }} (ID: {{ midia.id }})</h3>
+                    <p><strong>Formato Original:</strong> {{ midia.formato_original }}</p>
+                    <p><strong>Formato Atual:</strong> {{ midia.formato_atual }}</p>
+                    <p><strong>Estratégia Atual:</strong> {{ midia.strategy if midia.strategy else 'Nenhuma (usará padrão se houver)' }}</p>
+                    
+                    <form class="process-form" action="{{ url_for('process_media_route', media_id=midia.id) }}" method="POST">
+                        <label for="strategy_key_{{midia.id}}">Nova Estratégia:</label>
+                        <select name="strategy_key" id="strategy_key_{{midia.id}}">
+                            <option value="">-- Manter/Usar Padrão --</option>
+                            {% for key, strat_factory in processing_strategies.items() %}
+                            <option value="{{ key }}">{{ strat_factory() }}</option>
+                            {% endfor %}
+                        </select>
+                        <button type="submit">Aplicar Estratégia e Processar</button>
+                    </form>
+
+                    {% if midia.logs_processamento and processed_media_id == midia.id %}
+                        <h4>Logs do Último Processamento (Mídia ID {{midia.id}}):</h4>
+                        <div class="logs">
+                            {% for log_line in midia.logs_processamento %}
+                                <p>{{ log_line }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhuma mídia cadastrada.</p>
+            {% endif %}
+        </div>
+
+        <div class="logs-section">
+            <h2>Logs Gerais da Aplicação</h2>
+            <div class="logs">
+                {% for log_entry in app_logs %}
+                    <p>{{ log_entry }}</p>
+                {% endfor %}
+                 {% if not app_logs %} <p>Nenhum log da aplicação ainda.</p> {% endif %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>
