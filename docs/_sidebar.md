@@ -15,7 +15,7 @@
     - **3.3. Padrões de Projeto GoFs Comportamentais**
       - [3.3.1 Strategy](/PadroesDeProjeto/GOFsComportamentais/3.3.1.Strategy.md)
       - [3.3.2 State](/PadroesDeProjeto/GOFsComportamentais/3.3.2.State.md)
-      - [3.3.3 Method](/PadroesDeProjeto/3.3.3.Method.md)
+      - [3.3.3 Template Method](/PadroesDeProjeto/3.3.3.Method.md)
     - [3.4. Participações - Padrões de Projeto](/PadroesDeProjeto/3.4.ParticipacoesPadroes.md)
     - [3.5. Iniciativas Extras - Padrões de Projeto](/PadroesDeProjeto/3.5.1.AtualizaçãoDiagramaClasses.md)
       - [3.5.1 Novo Diagrama de Classes](/PadroesDeProjeto/3.5.1.AtualizaçãoDiagramaClasses.md)
