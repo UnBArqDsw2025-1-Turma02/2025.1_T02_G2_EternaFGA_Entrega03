@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional, List
 
-
+# --- Classe Sessao ---
 class Sessao:
     def __init__(self, token: str, usuario: str, duracao_minutos: int = 30):
         self.token = token
@@ -25,6 +25,7 @@ class Sessao:
         self.ativa = False
 
 
+# --- Singleton Autenticador ---
 class Autenticador:
     __instancia = None
 
@@ -63,3 +64,59 @@ class Autenticador:
             if sessao.token == token and sessao.is_valida():
                 return True
         return False
+
+
+# --- Execução Interativa ---
+def menu():
+    print("\n--- MENU ---")
+    print("1. Autenticar usuário")
+    print("2. Validar token")
+    print("3. Encerrar sessão")
+    print("4. Ver usuário logado")
+    print("5. Sair")
+
+
+def main():
+    auth = Autenticador.get_instancia()
+    token_atual = None
+    login_atual = "admin"  # usuário fixo para teste
+
+    while True:
+        menu()
+        opcao = input("Escolha uma opção: ")
+
+        if opcao == "1":
+            senha = input("Digite a senha: ")
+            token = auth.autenticar_usuario(login_atual, senha)
+            if token:
+                token_atual = token
+                print(f"\n✅ Autenticado com sucesso! Token: {token}")
+            else:
+                print("\n❌ Falha na autenticação.")
+
+        elif opcao == "2":
+            if token_atual and auth.validar_token(token_atual):
+                print("\n✅ Token válido!")
+            else:
+                print("\n❌ Token inválido ou expirado.")
+
+        elif opcao == "3":
+            auth.terminar_sessao(login_atual)
+            print("\n📴 Sessão encerrada.")
+
+        elif opcao == "4":
+            usuario = auth.get_usuario_logado(login_atual)
+            if usuario:
+                print(f"\n👤 Usuário logado: {usuario}")
+            else:
+                print("\n⚠️ Nenhum usuário logado ou sessão expirada.")
+
+        elif opcao == "5":
+            print("\n👋 Saindo...")
+            break
+
+        else:
+            print("❗ Opção inválida!")
+
+if __name__ == "__main__":
+    main()
