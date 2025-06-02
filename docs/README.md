@@ -32,9 +32,11 @@ A Eterna FGA é um museu afetivo virtual, uma aplicação web criada para eterni
 
 ## Há algo a ser executado?
 
-( ) SIM
+(X) SIM
 
-(X) NÃO
+( ) NÃO
+
+[Pasta com os projetos executáveis](../Projeto/README.md)
 
 ## Histórico de Versão
 
